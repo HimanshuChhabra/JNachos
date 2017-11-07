@@ -67,6 +67,7 @@ public class PageFaultHandler {
 			else{
 				Debug.print('t', "PageEntry Not Found in the Page Table");
 				System.out.println("PageEntry Not Found in the Page Table");
+				
 			}
 			
 		}
