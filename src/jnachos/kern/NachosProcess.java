@@ -8,8 +8,9 @@
  */
 package jnachos.kern;
 
-import java.util.LinkedList;
+import java.util.*;
 
+import jnachos.kern.messages.MessageBuffer;
 import jnachos.machine.Interrupt;
 import jnachos.machine.Machine;
 
@@ -84,7 +85,16 @@ public class NachosProcess implements Runnable {
 	 * NachosProcess Id is the unique Identifier for the thread.
 	 */
 	private int mpid;
-
+	/**
+	 * Process Message Queue
+	 */
+	
+	private Map<Integer,MessageBuffer> processMessageQueue;
+	
+	/**
+	 * Count of total number of messages sent by that process
+	 */
+	private static int messageCount = 0;
 	
 	/**
 	 * Initialize a Process control block, so that we can then call fork.
@@ -113,6 +123,8 @@ public class NachosProcess implements Runnable {
 		mUserRegisters = new int[Machine.NumTotalRegs];
 		
 		allProcesses.addLast(this);
+		
+		processMessageQueue = new HashMap<Integer,MessageBuffer>();
 	}
 	
 	/**
@@ -307,6 +319,11 @@ public class NachosProcess implements Runnable {
 		
 		return false;
 	}
+	/**
+	 * Get process by ID
+	 * @param pid
+	 * @return
+	 */
 	
 	public static NachosProcess getProcessByID(int pid){
 		
@@ -315,6 +332,25 @@ public class NachosProcess implements Runnable {
 				return process;
 		}
 		return null;
+	}
+	
+	/**
+	 * get process by process name
+	 */
+	public static NachosProcess getProcessByName(String name) {
+		for(NachosProcess process : allProcesses){
+			if(process.getName().equals(name))
+				return process;
+		}
+		return null;
+	}
+	
+	public static boolean isProcessAlive(int pid) {
+		for(NachosProcess process : allProcesses){
+			if(process.getPid() == pid)
+				return true;
+		}
+		return false;
 	}
 	
 	/**
@@ -347,6 +383,9 @@ public class NachosProcess implements Runnable {
 
 		// Mark this process as to be destroyed
 		JNachos.setProcessToBeDestroyed(this);
+		
+		//remove process from list of processes
+		allProcesses.remove(this);
 
 		// Put ourself to sleep
 		sleep();
@@ -592,5 +631,13 @@ public class NachosProcess implements Runnable {
 	
 	public int[] getUserRegisters(){
 		return mUserRegisters;
+	}
+	
+	public Map<Integer,MessageBuffer> getProcessMessageQueue(){
+		return processMessageQueue;
+	}
+	
+	public int getMessageCount() {
+		return ++messageCount;
 	}
 }

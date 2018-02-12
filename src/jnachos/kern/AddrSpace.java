@@ -124,7 +124,7 @@ public class AddrSpace {
 			executable.readAt(bytes, Machine.PageSize, noffH.code.inFileAddr + i * Machine.PageSize);
 
 			// first virtual page will be loaded into the main memory as well as the swapSpace;
-			if(i == 0){
+			//if(i == 0){
 				
 				mPageTable[i].physicalPage = mFreeMap.find();
 				mPageTable[i].valid = true;
@@ -154,11 +154,11 @@ public class AddrSpace {
 					mPageTable[i].valid = false;
 				}
 				
-			}else{
+			/*}else{
 				// All other pages go into the Swap file only
 				mPageTable[i].physicalPage = -1;
 				mPageTable[i].valid = false;
-			}
+			}*/
 			
 			JNachos.getSwapFile().writeAt(bytes, Machine.PageSize, mPageTable[i].swapLoc*Machine.PageSize);	
 		}
@@ -191,7 +191,7 @@ public class AddrSpace {
 		// a separate page, we could set its
 		// pages to be read-only
 
-			if (i == 0) {
+			//if (i == 0) {
 				mPageTable[i].physicalPage = mFreeMap.find();
 
 				if (mPageTable[i].physicalPage != -1) {
@@ -205,18 +205,24 @@ public class AddrSpace {
 					/*// Zero out all of main memory
 					Arrays.fill(Machine.mMainMemory, mPageTable[i].physicalPage * Machine.PageSize,
 					(mPageTable[i].physicalPage + 1) * Machine.PageSize, (byte) 0);*/
-
+					
+					// did not work, so below direct copy from the virtual addr.
 					// Copy from parents phy page into the main memory
-						System.arraycopy(Machine.mMainMemory, pToCopy.mPageTable[i].swapLoc * Machine.PageSize,
-						Machine.mMainMemory, mPageTable[i].physicalPage * Machine.PageSize, Machine.PageSize);
+						/*System.arraycopy(Machine.mMainMemory, pToCopy.mPageTable[i].swapLoc * Machine.PageSize,
+						Machine.mMainMemory, mPageTable[i].physicalPage * Machine.PageSize, Machine.PageSize);*/
+			
+					
+					// Copy from parents phy page into the main memory
+					System.arraycopy(Machine.mMainMemory, pToCopy.mPageTable[i].virtualPage * Machine.PageSize,
+					Machine.mMainMemory, mPageTable[i].physicalPage * Machine.PageSize, Machine.PageSize);	
 
 				} else {
 					mPageTable[i].valid = false;
 				}
-			} else {
-				mPageTable[i].physicalPage = -1;
-				mPageTable[i].valid = false;
-			}
+			//} else {
+				//mPageTable[i].physicalPage = -1;
+				//mPageTable[i].valid = false;
+			//}
 			// Add it to the temp buffer
 			byte[] buffer = new byte[Machine.PageSize];
 			

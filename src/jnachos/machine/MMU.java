@@ -45,7 +45,7 @@ public class MMU {
 	public static boolean mUSE_TLB;
 
 	/** The size of a page. The same as a disk sector for simplicity. */
-	public static final int PageSize = 16;
+	public static final int PageSize = 128;
 
 	/**
 	 * ??

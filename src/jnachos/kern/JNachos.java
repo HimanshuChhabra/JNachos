@@ -15,7 +15,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+
 import jnachos.filesystem.*;
+import jnachos.kern.messages.MessageBuffer;
 
 /**
  * Interrupt handler for the timer device. The timer device is set up to
@@ -120,7 +122,32 @@ public abstract class JNachos {
 	 * 
 	 * private static PostOffice mPostOffice;
 	 */
-
+	
+	/**
+	 * Message buffer bitmap 
+	 */
+	private static BitMap mBuffers;
+	
+	/**
+	 * Message buffer queue
+	 */
+	private static Map<Integer,List<MessageBuffer>> mBufferQueue;
+	
+	/**
+	 * Dummy Message
+	 */
+	public static final String DUMMY_MESSAGE  ="Dummy_Message";
+	
+	/**
+	 * Error Message
+	 */
+	public static final String ERROR_MESSAGE  ="Security_Error_Message";
+	
+	/**
+	 * Max number of Messages sent by each process
+	 */
+	public static final int MESSAGE_LIMIT  = 10;
+	
 	/**
 	 * The constructor for this class should never be called. Every member
 	 * variable and function should be static.
@@ -240,7 +267,12 @@ public abstract class JNachos {
 		
 		//Initialize the Process To Physical Page Map
 		phyPagesToProcess = new HashMap<Integer,Integer>();
-	}
+		
+		//Initialise the message buffer array
+		mBuffers = new BitMap(100);
+		
+		mBufferQueue  = new HashMap<Integer,List<MessageBuffer>>();
+	} 
 
 	/**
 	 * Cleaning up the operating system on shut down. JNachos is halting.
@@ -421,5 +453,40 @@ public abstract class JNachos {
 	 */
 	public static Map<Integer,Integer> getPhyPageNumtoProcessId(){
 		return phyPagesToProcess;
+	}
+	
+	/**
+	 * Bitmap to get  next buffer
+	 * @return
+	 */
+	public static BitMap getMessageBuffer() {
+		return mBuffers;
+	}
+	
+	/**
+	 * Get Message Buffer Queue
+	 */
+	public static Map<Integer,List<MessageBuffer>> getMessageBufferQueue(){
+		return mBufferQueue;
+	}
+	
+	/**
+	 * Clear Message Buffer, remove the Message form the queue
+	 * @param mBuffer
+	 */
+	public static void clearMessageBuffer(int bufferID) {
+		getMessageBuffer().clear(bufferID);
+		if(getMessageBufferQueue().containsKey(bufferID)) {
+			System.out.println("Clearing the Message buffer: "+ bufferID);
+			if(!getMessageBufferQueue().isEmpty())
+				getMessageBufferQueue().remove(bufferID);
+		}
+	}
+	
+	/**
+	 * get the message limit
+	 */
+	public static int getMessageLimit() {
+		return MESSAGE_LIMIT;
 	}
 }
